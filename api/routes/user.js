@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const _ = require("lodash");
 require("dotenv").config();
 
@@ -9,14 +8,20 @@ const User = require("../models/user");
 const auth = require("../middlewares/auth");
 
 router.get("/me", auth, async (req, res) => {
-  console.log(req.user._id);
-
   const result = await User.findById(req.user._id);
+
+  if (!result)
+    return res.status(404).json({
+      status: "failure",
+      message: "User not found",
+    });
+
+  const data = _.pick(result, ["_id", "username", "email_address"]);
 
   return res.status(200).json({
     status: "Success",
-    message: "User get api working",
-    data: result,
+    message: "User retrieved successfully",
+    data: data,
   });
 });
 
@@ -67,7 +72,7 @@ router.post("/register", async (req, res) => {
     });
   });
 
-  const token = await jwt.sign({ _id: newUser._id }, process.env.jwtPrivateKey);
+  const token = newUser.generateAuthToken();
 
   res.setHeader("x-auth-token", token);
 
@@ -116,16 +121,15 @@ router.post("/login", async (req, res) => {
       message: "Incorrect password",
     });
 
-  const token = await jwt.sign(
-    { _id: userExists[0]._id },
-    process.env.jwtPrivateKey
-  );
+  console.log("USER", userExists[0].generateAuthToken());
+
+  const token = userExists[0].generateAuthToken();
 
   res.setHeader("x-auth-token", token);
 
   const data = _.pick(userExists[0], ["_id", "username", "email_address"]);
 
-  return res.status(201).json({
+  return res.status(200).json({
     status: "success",
     message: "user logged in",
     data: data,
