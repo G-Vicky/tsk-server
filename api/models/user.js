@@ -27,6 +27,33 @@ const userSchema = new mongoose.Schema({
     minLength: 3,
     maxLength: 1024,
   },
+  app: {
+    name: {
+      type: String,
+      minLength: 3,
+      maxLength: 255,
+      required: function () {
+        return this.app.client_id || this.app.client_secret;
+      },
+    },
+    client_id: {
+      type: mongoose.Types.ObjectId,
+      minLength: 3,
+      maxLength: 255,
+      unique: true,
+      required: function () {
+        return this.app.name;
+      },
+    },
+    client_secret: {
+      type: String,
+      minLength: 3,
+      maxLength: 1024,
+      required: function () {
+        return this.app.name;
+      },
+    },
+  },
 });
 
 userSchema.methods.generateAuthToken = function () {
