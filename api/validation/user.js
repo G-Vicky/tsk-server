@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 const newUserSchema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(30).required(),
+  username: Joi.string().min(3).max(30).required(),
   email_address: Joi.string().min(3).max(30).required().email(),
   password: Joi.string().min(3).max(30).required(),
 }).options({ abortEarly: false });

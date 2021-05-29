@@ -40,7 +40,6 @@ const userSchema = new mongoose.Schema({
       type: mongoose.Types.ObjectId,
       minLength: 3,
       maxLength: 255,
-      unique: true,
       required: function () {
         return this.app.name;
       },
