@@ -28,8 +28,8 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token"
   );
-  res.header("Access-Control-Expose-Headers", "x-auth-token");
-  res.header("Access-Control-Expose-Headers", "Authorization");
+  // res.header("Access-Control-Expose-Headers", "x-auth-token");
+  res.header("Access-Control-Expose-Headers", "*, Authorization");
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Methods", "PUT, POST, DELETE, GET");
     return res.status(200).json({});
