@@ -27,6 +27,17 @@ const userSchema = new mongoose.Schema({
     minLength: 3,
     maxLength: 1024,
   },
+  tasks: [
+    {
+      title: String,
+      items: [
+        {
+          title: String,
+          completed: { type: Boolean, default: false },
+        },
+      ],
+    },
+  ],
   app: {
     name: {
       type: String,

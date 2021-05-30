@@ -4,3 +4,7 @@ node_modules/
 //files
 demo.js
 .env
+
+//postman Collections
+Tasks Collection.postman_collection.json
+Users collection.postman_collection.json
