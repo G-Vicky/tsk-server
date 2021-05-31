@@ -5,15 +5,15 @@ require("dotenv").config();
 
 const { userValidation, newUserValidation } = require("../validation/user");
 const User = require("../models/user");
-const auth = require("../middlewares/auth");
+const verifyToken = require("../middlewares/auth");
 
 //get info about current user
-router.get("/me", auth, async (req, res) => {
+router.get("/me", verifyToken, async (req, res) => {
   const user = await User.findById(req.user._id).catch((err) => {
     return res.status(500).json({
       status: "failure",
       error_code: "server-error",
-      error_message: "Internal Server Error",
+      error: ["Internal Server Error"],
     });
   });
 
@@ -21,7 +21,7 @@ router.get("/me", auth, async (req, res) => {
     return res.status(404).json({
       status: "failure",
       error_code: "not-found",
-      error_message: "User not found/User doesn't exist",
+      error: ["User not found/User doesn't exist"],
     });
 
   const data = _.pick(user, ["_id", "username", "email_address"]);
@@ -42,7 +42,7 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({
       status: "failure",
       error_code: "joi-fails",
-      error_message: result,
+      error: result,
     });
   }
 
@@ -52,7 +52,7 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({
       status: "failure",
       error_code: "duplicate-entry",
-      error_message: ["user already exists"],
+      error: ["user already exists"],
     });
   }
 
@@ -70,7 +70,7 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({
       status: "failure",
       error_code: "schema-fails",
-      error_message: [err.message],
+      error: [err.message],
     });
   }
 

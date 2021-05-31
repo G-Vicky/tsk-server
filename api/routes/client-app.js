@@ -2,12 +2,12 @@ const router = require("express").Router();
 const _ = require("lodash");
 const mongoose = require("mongoose");
 const randomstring = require("randomstring");
-const auth = require("../middlewares/auth");
+const verifyToken = require("../middlewares/auth");
 const User = require("../models/user");
 const { clientAppValidation } = require("../validation/client-app");
 
 //get client-app
-router.get("/myapp", auth, async (req, res) => {
+router.get("/myapp", verifyToken, async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (!user.app) {
@@ -28,7 +28,7 @@ router.get("/myapp", auth, async (req, res) => {
 });
 
 // create new client-app
-router.post("/", auth, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user.app.name) {
@@ -80,7 +80,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 //delete client-app
-router.delete("/", auth, async (req, res) => {
+router.delete("/", verifyToken, async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (!user.app) {

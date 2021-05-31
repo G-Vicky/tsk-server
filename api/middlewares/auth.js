@@ -2,12 +2,13 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-module.exports = async function auth(req, res, next) {
-  const token = req.header("x-auth-token");
-  if (!token)
+module.exports = async function verifyToken(req, res, next) {
+  const token = req.header("Authorization").split(" ")[1];
+  if (!token || token === "")
     return res.status(401).json({
       status: "failure",
-      message: "User not Authorized",
+      error_code: "un-authorized",
+      error: ["User not Authorized"],
     });
 
   try {
@@ -20,7 +21,7 @@ module.exports = async function auth(req, res, next) {
       return res.status(404).json({
         status: "failure",
         error_code: "not-found",
-        error_message: "User not found/User doesn't exist",
+        error: ["User not found/User doesn't exist"],
       });
     }
   } catch (error) {
@@ -31,7 +32,6 @@ module.exports = async function auth(req, res, next) {
       error: ["auth-token is invalid"],
     });
   }
-
 
   next();
 };

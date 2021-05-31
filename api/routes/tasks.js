@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const mongoose = require("mongoose");
 const _ = require("lodash");
-const auth = require("../middlewares/auth");
+const verifyToken = require("../middlewares/auth");
 const User = require("../models/user");
 const {
   taskValidation,
@@ -10,7 +10,7 @@ const {
 const user = require("../models/user");
 
 //get all tasks
-router.get("/", auth, async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   const data = await User.find(
     { _id: req.user._id },
     { username: 1, email_address: 1, tasks: 1 }
@@ -23,7 +23,7 @@ router.get("/", auth, async (req, res) => {
 });
 
 //create new task
-router.post("/", auth, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   const { error } = taskValidation(req.body);
   if (error) {
     let result = _.map(error.details, "message");
@@ -31,7 +31,7 @@ router.post("/", auth, async (req, res) => {
     return res.status(400).json({
       status: "failure",
       error_code: "joi-fails",
-      error_message: result,
+      error: result,
     });
   }
 
@@ -51,7 +51,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 //delete task
-router.delete("/:taskID", auth, async (req, res) => {
+router.delete("/:taskID", verifyToken, async (req, res) => {
   const taskID = req.params.taskID;
   const result = await User.updateOne(
     { _id: req.user._id, "tasks._id": taskID },
@@ -73,7 +73,7 @@ router.delete("/:taskID", auth, async (req, res) => {
 });
 
 //add new task item
-router.post("/:taskID", auth, async (req, res) => {
+router.post("/:taskID", verifyToken, async (req, res) => {
   const taskID = req.params.taskID;
   const { error } = taskItemValidation(req.body);
   if (error) {
@@ -82,7 +82,7 @@ router.post("/:taskID", auth, async (req, res) => {
     return res.status(400).json({
       status: "failure",
       error_code: "joi-fails",
-      error_message: result,
+      error: result,
     });
   }
 
@@ -102,13 +102,13 @@ router.post("/:taskID", auth, async (req, res) => {
     return res.status(404).json({
       status: "failure",
       error_code: "not-found",
-      error_message: ["task not found"],
+      error: ["task not found"],
     });
   }
 });
 
 //update task item
-router.put("/:taskID/:itemIndex", auth, async (req, res) => {
+router.put("/:taskID/:itemIndex", verifyToken, async (req, res) => {
   const taskID = req.params.taskID;
   const itemIndex = req.params.itemIndex;
   const { error } = taskItemValidation(req.body);
@@ -118,7 +118,7 @@ router.put("/:taskID/:itemIndex", auth, async (req, res) => {
     return res.status(400).json({
       status: "failure",
       error_code: "joi-fails",
-      error_message: result,
+      error: result,
     });
   }
 
@@ -141,13 +141,13 @@ router.put("/:taskID/:itemIndex", auth, async (req, res) => {
     return res.status(404).json({
       status: "failure",
       error_code: "not-found",
-      error_message: ["task item not found"],
+      error: ["task item not found"],
     });
   }
 });
 
 //delete task item
-router.delete("/:taskID/:itemID", auth, async (req, res) => {
+router.delete("/:taskID/:itemID", verifyToken, async (req, res) => {
   const taskID = req.params.taskID;
   const itemID = req.params.itemID;
 
@@ -167,7 +167,7 @@ router.delete("/:taskID/:itemID", auth, async (req, res) => {
     return res.status(404).json({
       status: "failure",
       error_code: "not-found",
-      error_message: ["task item not found"],
+      error: ["task item not found"],
     });
   }
 });
