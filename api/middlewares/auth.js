@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 module.exports = async function verifyToken(req, res, next) {
-  const token = req.header("Authorization").split(" ")[1];
+  const header = req.header("Authorization") || "";
+  const token = header.split(" ")[1];
   if (!token || token === "")
     return res.status(401).json({
       status: "failure",
