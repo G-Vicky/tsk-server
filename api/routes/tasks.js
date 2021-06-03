@@ -108,29 +108,47 @@ router.post("/:taskID", verifyToken, async (req, res) => {
 });
 
 //update task item
-router.put("/:taskID/:itemIndex", verifyToken, async (req, res) => {
+router.put("/:taskID/:itemID", verifyToken, async (req, res) => {
   const taskID = req.params.taskID;
-  const itemIndex = req.params.itemIndex;
-  const { error } = taskItemValidation(req.body);
-  if (error) {
-    let result = _.map(error.details, "message");
-    result = _.map(result, (s) => s.replace(/['"]+/g, ""));
-    return res.status(400).json({
-      status: "failure",
-      error_code: "joi-fails",
-      error: result,
-    });
-  }
+  const itemID = req.params.itemID;
+  console.log(taskID, itemID);
+  // const { error } = taskItemValidation(req.body);
+  // if (error) {
+  //   let result = _.map(error.details, "message");
+  //   result = _.map(result, (s) => s.replace(/['"]+/g, ""));
+  //   return res.status(400).json({
+  //     status: "failure",
+  //     error_code: "joi-fails",
+  //     error: result,
+  //   });
+  // }
 
   const item = req.body;
 
   try {
-    const path = `tasks.$.items.${itemIndex}`;
+    const path = `tasks.$_id.items`;
+    console.log(path);
     const data = await User.findOneAndUpdate(
-      { _id: req.user._id, "tasks._id": taskID },
-      { $set: { [path]: item } },
-      { new: true }
+      {
+        $and: [
+          {
+            items: {
+              $in: [itemID],
+            },
+          },
+          {
+            _id: req.user._id,
+          },
+          {
+            "tasks._id": taskID,
+          },
+        ],
+      },
+      {
+        $set: { completed: true },
+      }
     );
+    console.log(data);
     res.status(201).json({
       status: "success",
       message: "item updated",
